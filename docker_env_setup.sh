@@ -15,6 +15,7 @@ if [[ $- == *i* ]]; then
     alias rosenv="source /opt/ros/humble/setup.bash"
     alias sws="cd /workspace/ros_ws && rm -rf build install log && colcon build --symlink-install && source install/setup.bash"
     alias ws="cd /workspace/ros_ws"
+    alias sisb="source install/setup.bash"
     alias cbt="colcon build --symlink-install --packages-select"
     alias cl="colcon list"
     alias cln="rm -rf build install log"
