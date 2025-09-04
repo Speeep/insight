@@ -22,6 +22,8 @@ def generate_launch_description():
                 'launch',
                 'rs_launch.py')),
         launch_arguments={
+            'camera_namespace': '',
+            'camera_name': 'realsense',
             'enable_color': 'true',
             'rgb_camera.color_profile': '640x480x30',   # resolution + fps
             'rgb_camera.color_format': 'RGB8',          # color encoding
