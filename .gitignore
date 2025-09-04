@@ -155,7 +155,6 @@ ros_ws/install
 ros_ws/log
 
 # RViz / Gazebo / Ignition temporary files
-*.rviz
 *.vcg
 *.dae.cache
 *.world
