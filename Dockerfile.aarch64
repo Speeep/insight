@@ -1,0 +1,73 @@
+# Use NVIDIA Isaac ROS base image for Jetson Orin + ROS 2 Humble
+FROM nvcr.io/nvidia/isaac/ros:aarch64-ros2_humble_77e6a678c2058abf96bedcb8f7dd4330
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Locale setup
+RUN apt-get update && apt-get install -y --no-install-recommends \
+      locales ca-certificates curl gnupg2 lsb-release \
+    && locale-gen en_US en_US.UTF-8 \
+    && update-locale LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8 \
+    && rm -rf /var/lib/apt/lists/*
+ENV LANG=en_US.UTF-8
+
+# System dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+      software-properties-common \
+      python3 python3-pip python3-dev python3-setuptools \
+      libopenblas-dev libopenmpi-dev \
+      i2c-tools git vim \
+      iputils-ping net-tools dnsutils \
+      mesa-utils libgl1-mesa-glx libx11-6 libxext6 libxrender1 libxrandr2 libxi6 \
+      usbutils v4l-utils udev \
+      cmake build-essential libusb-1.0-0-dev libssl-dev pkg-config \
+      ros-humble-rmw-cyclonedds-cpp \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+# Build & install librealsense (RSUSB backend) into /usr/local to avoid conflicts
+ARG REALSENSE_VERSION=v2.56.4
+WORKDIR /usr/local/src
+RUN git clone https://github.com/IntelRealSense/librealsense.git && \
+    cd librealsense && git checkout ${REALSENSE_VERSION} && \
+    mkdir build && cd build && \
+    cmake .. -DFORCE_RSUSB_BACKEND=ON -DCMAKE_BUILD_TYPE=Release && \
+    make -j"$(nproc)" && make install && ldconfig && \
+    rm -rf /usr/local/src/librealsense
+# Ensure the runtime picks /usr/local first
+ENV PATH="/usr/local/bin:${PATH}"
+ENV LD_LIBRARY_PATH="/usr/local/lib:${LD_LIBRARY_PATH}"
+
+# ROS2 tools
+RUN apt-get update && apt-get install -y --no-install-recommends \
+      python3-colcon-common-extensions \
+      python3-rosdep \
+      ros-humble-joint-state-publisher \
+      ros-humble-joint-state-publisher-gui \
+    && rosdep init || true \
+    && rosdep update \
+    && rm -rf /var/lib/apt/lists/*
+
+# Python packages
+RUN pip3 install --no-cache-dir \
+      Jetson.GPIO \
+      pyserial \
+      pynput \
+      numpy \
+      scipy
+
+# Automatically source docker_env_setup.sh for interactive shells
+RUN echo '[ -f /workspace/docker_env_setup.sh ] && source /workspace/docker_env_setup.sh' >> /root/.bashrc
+
+# CycloneDDS config (Jetson)
+ENV ROS_DOMAIN_ID=68
+ENV RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
+ENV CYCLONEDDS_URI=file:///workspace/cyclonedds_jetson.xml
+
+# Create ROS workspace
+WORKDIR /workspace/ros_ws
+RUN mkdir -p src
+
+# Default command
+CMD [ "bash" ]
+

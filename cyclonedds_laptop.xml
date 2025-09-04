@@ -1,0 +1,11 @@
+<!-- cyclonedds_laptop.xml -->
+<CycloneDDS>
+  <Domain id="any">
+    <General>
+      <AllowMulticast>true</AllowMulticast>
+      <Interfaces>
+        <NetworkInterface name="wlo1"/>
+      </Interfaces>
+    </General>
+  </Domain>
+</CycloneDDS>

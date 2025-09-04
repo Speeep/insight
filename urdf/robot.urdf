@@ -1,0 +1,149 @@
+<?xml version="1.0"?>
+<robot name="robot">
+
+  <!-- Base chassis -->
+  <link name="chassis">
+    <!-- Visual mesh -->
+    <visual>
+      <geometry>
+        <mesh filename="meshes/chassis.dae" scale="1 1 1"/>
+      </geometry>
+    </visual>
+
+    <!-- Simplified collision -->
+    <collision>
+      <geometry>
+        <box size="0.6 0.5 0.35"/> <!-- example box covering chassis -->
+      </geometry>
+      <origin xyz="0 0 0.175" rpy="0 0 0"/>
+    </collision>
+  </link>
+
+  <!-- === Wheel Pods === -->
+  <!-- Front Left -->
+  <link name="front_left_pod">
+    <visual>
+      <geometry>
+        <mesh filename="meshes/wheelpod.dae" scale="1 1 1"/>
+      </geometry>
+    </visual>
+  </link>
+  <joint name="chassis_to_front_left_pod" type="revolute">
+    <parent link="chassis"/>
+    <child link="front_left_pod"/>
+    <origin xyz="0.2025 0.152345 0.1395" rpy="0 0 3.14159"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="-1.5708" upper="1.5708" effort="10" velocity="1"/>
+  </joint>
+
+  <!-- Front Right -->
+  <link name="front_right_pod">
+    <visual>
+      <geometry>
+        <mesh filename="meshes/wheelpod.dae" scale="1 1 1"/>
+      </geometry>
+    </visual>
+  </link>
+  <joint name="chassis_to_front_right_pod" type="revolute">
+    <parent link="chassis"/>
+    <child link="front_right_pod"/>
+    <origin xyz="0.2025 -0.152346 0.1395" rpy="0 0 0"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="-1.5708" upper="1.5708" effort="10" velocity="1"/>
+  </joint>
+
+  <!-- Back Left -->
+  <link name="back_left_pod">
+    <visual>
+      <geometry>
+        <mesh filename="meshes/wheelpod.dae" scale="1 1 1"/>
+      </geometry>
+    </visual>
+  </link>
+  <joint name="chassis_to_back_left_pod" type="revolute">
+    <parent link="chassis"/>
+    <child link="back_left_pod"/>
+    <origin xyz="-0.2025 0.152345 0.1395" rpy="0 0 3.14159"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="-1.5708" upper="1.5708" effort="10" velocity="1"/>
+  </joint>
+
+  <!-- Back Right -->
+  <link name="back_right_pod">
+    <visual>
+      <geometry>
+        <mesh filename="meshes/wheelpod.dae" scale="1 1 1"/>
+      </geometry>
+    </visual>
+  </link>
+  <joint name="chassis_to_back_right_pod" type="revolute">
+    <parent link="chassis"/>
+    <child link="back_right_pod"/>
+    <origin xyz="-0.2025 -0.152346 0.1395" rpy="0 0 0"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="-1.5708" upper="1.5708" effort="10" velocity="1"/>
+  </joint>
+
+  <!-- === Wheels === -->
+  <!-- Front Left Wheel -->
+  <link name="front_left_wheel">
+    <visual>
+      <geometry>
+        <mesh filename="meshes/wheel.dae" scale="1 1 1"/>
+      </geometry>
+    </visual>
+  </link>
+  <joint name="front_left_pod_to_wheel" type="continuous">
+    <parent link="front_left_pod"/>
+    <child link="front_left_wheel"/>
+    <origin xyz="0 0.004 -0.07905" rpy="-1.5708 0 0"/>
+    <axis xyz="0 0 1"/>
+  </joint>
+
+  <!-- Front Right Wheel -->
+  <link name="front_right_wheel">
+    <visual>
+      <geometry>
+        <mesh filename="meshes/wheel.dae" scale="1 1 1"/>
+      </geometry>
+    </visual>
+  </link>
+  <joint name="front_right_pod_to_wheel" type="continuous">
+    <parent link="front_right_pod"/>
+    <child link="front_right_wheel"/>
+    <origin xyz="0 0.004 -0.07905" rpy="-1.5708 0 0"/>
+    <axis xyz="0 0 1"/>
+  </joint>
+
+  <!-- Back Left Wheel -->
+  <link name="back_left_wheel">
+    <visual>
+      <geometry>
+        <mesh filename="meshes/wheel.dae" scale="1 1 1"/>
+      </geometry>
+    </visual>
+  </link>
+  <joint name="back_left_pod_to_wheel" type="continuous">
+    <parent link="back_left_pod"/>
+    <child link="back_left_wheel"/>
+    <origin xyz="0 0.004 -0.07905" rpy="-1.5708 0 0"/>
+    <axis xyz="0 0 1"/>
+  </joint>
+
+  <!-- Back Right Wheel -->
+  <link name="back_right_wheel">
+    <visual>
+      <geometry>
+        <mesh filename="meshes/wheel.dae" scale="1 1 1"/>
+      </geometry>
+    </visual>
+  </link>
+  <joint name="back_right_pod_to_wheel" type="continuous">
+    <parent link="back_right_pod"/>
+    <child link="back_right_wheel"/>
+    <origin xyz="0 0.004 -0.07905" rpy="-1.5708 0 0"/>
+    <axis xyz="0 0 1"/>
+  </joint>
+
+</robot>
+

@@ -1,0 +1,12 @@
+<!-- cyclonedds_jetson.xml -->
+<CycloneDDS>
+  <Domain id="any">
+    <General>
+      <AllowMulticast>true</AllowMulticast>
+      <Interfaces>
+        <NetworkInterface name="wlP1p1s0"/>
+      </Interfaces>
+    </General>
+  </Domain>
+</CycloneDDS>
+
