@@ -19,9 +19,24 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
       i2c-tools git vim \
       iputils-ping net-tools dnsutils \
       mesa-utils libgl1-mesa-glx libx11-6 libxext6 libxrender1 libxrandr2 libxi6 \
+      usbutils v4l-utils udev \
+      cmake build-essential libusb-1.0-0-dev libssl-dev pkg-config \
       ros-humble-rmw-cyclonedds-cpp \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
+
+# Build & install librealsense (RSUSB backend) into /usr/local to avoid conflicts
+ARG REALSENSE_VERSION=v2.56.4
+WORKDIR /usr/local/src
+RUN git clone https://github.com/IntelRealSense/librealsense.git && \
+    cd librealsense && git checkout ${REALSENSE_VERSION} && \
+    mkdir build && cd build && \
+    cmake .. -DFORCE_RSUSB_BACKEND=ON -DCMAKE_BUILD_TYPE=Release && \
+    make -j"$(nproc)" && make install && ldconfig && \
+    rm -rf /usr/local/src/librealsense
+# Ensure the runtime picks /usr/local first
+ENV PATH="/usr/local/bin:${PATH}"
+ENV LD_LIBRARY_PATH="/usr/local/lib:${LD_LIBRARY_PATH}"
 
 # ROS2 tools
 RUN apt-get update && apt-get install -y --no-install-recommends \
