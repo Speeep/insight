@@ -22,7 +22,8 @@ setup(
     license='Apache-2.0',
     entry_points={
         'console_scripts': [
-            'wasdqe_teleop = robot_teleop.wasdqe_teleop:main'
+            'wasdqe_teleop = robot_teleop.wasdqe_teleop:main',
+            'image_viewer = robot_teleop.image_viewer:main',
         ],
     },
 )
