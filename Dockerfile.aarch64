@@ -22,6 +22,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
       usbutils v4l-utils udev \
       cmake build-essential libusb-1.0-0-dev libssl-dev pkg-config \
       ros-humble-rmw-cyclonedds-cpp \
+      libserial-dev python3-serial \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
@@ -44,6 +45,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
       python3-rosdep \
       ros-humble-joint-state-publisher \
       ros-humble-joint-state-publisher-gui \
+      ros-humble-imu-tools \
     && rosdep init || true \
     && rosdep update \
     && rm -rf /var/lib/apt/lists/*
