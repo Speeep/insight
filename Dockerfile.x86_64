@@ -3,8 +3,24 @@ FROM nvcr.io/nvidia/isaac/ros:x86_64-ros2_humble_6f2a6bddf70fcd928f08e874635efe4
 
 ENV DEBIAN_FRONTEND=noninteractive
 
+# Base image apt sources occasionally drift (repo metadata/key rotations).
+# Normalize those before the first apt-get update so builds stay reproducible.
+RUN apt-get -o Acquire::AllowReleaseInfoChange::Origin=true \
+            -o Acquire::AllowReleaseInfoChange::Label=true \
+            update \
+    && apt-get install -y --no-install-recommends ca-certificates curl gnupg2 \
+    && mkdir -p /usr/share/keyrings \
+    && if [ -f /etc/apt/sources.list.d/yarn.list ]; then \
+         curl -fsSL https://dl.yarnpkg.com/debian/pubkey.gpg | gpg --dearmor -o /usr/share/keyrings/yarn-archive-keyring.gpg; \
+         printf "deb [signed-by=/usr/share/keyrings/yarn-archive-keyring.gpg] https://dl.yarnpkg.com/debian stable main\n" > /etc/apt/sources.list.d/yarn.list; \
+       fi \
+    && rm -rf /var/lib/apt/lists/*
+
 # Locale setup
-RUN apt-get update && apt-get install -y --no-install-recommends \
+RUN apt-get -o Acquire::AllowReleaseInfoChange::Origin=true \
+      -o Acquire::AllowReleaseInfoChange::Label=true \
+      update \
+    && apt-get install -y --no-install-recommends \
       locales ca-certificates curl gnupg2 lsb-release \
     && locale-gen en_US en_US.UTF-8 \
     && update-locale LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8 \
