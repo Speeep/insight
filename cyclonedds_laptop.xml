@@ -4,7 +4,7 @@
     <General>
       <AllowMulticast>true</AllowMulticast>
       <Interfaces>
-        <NetworkInterface name="wlo1"/>
+        <NetworkInterface name="wlp0s20f3"/>
       </Interfaces>
     </General>
   </Domain>
