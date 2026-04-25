@@ -36,7 +36,11 @@ def generate_launch_description():
             'serial_no': ParameterValue(realsense_serial, value_type=str),
             'enable_infra1': True,
             'enable_infra2': True,
-            'enable_color': False,
+            # Color enabled (lightweight) so teleop can show what the robot sees
+            # while VSLAM consumes the infra streams.
+            'enable_color': True,
+            'rgb_camera.color_profile': '640x480x30',
+            'rgb_camera.color_format': 'RGB8',
             'enable_depth': False,
             'depth_module.emitter_enabled': 0,
             'depth_module.depth_profile': '848x480x30',

@@ -12,7 +12,7 @@ class CompressedImageViewer(Node):
         super().__init__('compressed_image_viewer')
 
         # Parameters for low-latency teleop viewing.
-        self.declare_parameter('image_topic', '/realsense/color/image_raw/compressed')
+        self.declare_parameter('image_topic', '/camera/color/image_raw/compressed')
         self.declare_parameter('display_rate_hz', 30.0)
         self.image_topic = str(self.get_parameter('image_topic').value)
         display_rate_hz = float(self.get_parameter('display_rate_hz').value)
