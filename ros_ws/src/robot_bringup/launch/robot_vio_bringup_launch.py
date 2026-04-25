@@ -7,8 +7,14 @@ from ament_index_python.packages import get_package_share_directory
 import os
 
 
+# Pin the on-robot RealSense D455 by serial number so the launch always
+# binds to the same physical camera even if other RealSense devices appear.
+ROBOT_REALSENSE_SERIAL = '234222301624'
+
+
 def generate_launch_description():
     use_isaac_vslam = LaunchConfiguration('use_isaac_vslam')
+    realsense_serial = LaunchConfiguration('realsense_serial')
 
     # Robot control launch.
     control_launch = IncludeLaunchDescription(
@@ -22,6 +28,7 @@ def generate_launch_description():
     )
 
     # Local D455 RealSense stream profile (used when not delegating to Isaac launch).
+    # Topics are forced to the /camera/... namespace so they match what VSLAM expects.
     realsense_local_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(
@@ -32,7 +39,8 @@ def generate_launch_description():
         ),
         launch_arguments={
             'camera_namespace': '',
-            'camera_name': 'realsense',
+            'camera_name': 'camera',
+            'serial_no': realsense_serial,
             'enable_color': 'true',
             'rgb_camera.color_profile': '640x480x30',
             'rgb_camera.color_format': 'RGB8',
@@ -51,11 +59,15 @@ def generate_launch_description():
     )
 
     # Preferred path when Isaac ROS Visual SLAM package is installed.
-    # This official launch brings up RealSense + VSLAM together.
+    # Force camera_namespace+camera_name so RealSense topics land at /camera/...
+    # matching VSLAM subscriptions, and pin the camera serial.
     isaac_vslam_launch = ExecuteProcess(
         cmd=[
             'ros2', 'launch', 'isaac_ros_visual_slam',
-            'isaac_ros_visual_slam_realsense.launch.py'
+            'isaac_ros_visual_slam_realsense.launch.py',
+            'camera_namespace:=',
+            'camera_name:=camera',
+            ['serial_no:=', realsense_serial],
         ],
         output='screen',
         condition=IfCondition(use_isaac_vslam),
@@ -67,8 +79,12 @@ def generate_launch_description():
             default_value='true',
             description='Run Isaac ROS VSLAM + RealSense launch (requires isaac_ros_visual_slam package).',
         ),
+        DeclareLaunchArgument(
+            'realsense_serial',
+            default_value=ROBOT_REALSENSE_SERIAL,
+            description='Pin the RealSense camera by serial number for deterministic device selection.',
+        ),
         control_launch,
         realsense_local_launch,
         isaac_vslam_launch,
     ])
-
