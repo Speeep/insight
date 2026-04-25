@@ -14,7 +14,9 @@ def generate_launch_description():
                 'robot_control_launch.py'))
     )
 
-    # RealSense camera launch (color only, 30fps, no IMU, no sync)
+    # RealSense D455-oriented launch profile for teleop:
+    # - keep a lightweight color stream for driving
+    # - enable IMU so VIO work can start next
     realsense_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(
@@ -28,8 +30,11 @@ def generate_launch_description():
             'rgb_camera.color_profile': '640x480x30',   # resolution + fps
             'rgb_camera.color_format': 'RGB8',          # color encoding
             'enable_depth': 'false',
-            'enable_gyro': 'false',
-            'enable_accel': 'false',
+            'enable_gyro': 'true',
+            'enable_accel': 'true',
+            'unite_imu_method': '1',
+            'gyro_fps': '200',
+            'accel_fps': '100',
             'enable_sync': 'false',
         }.items()
     )

@@ -37,6 +37,8 @@ if [[ $- == *i* ]]; then
     alias rwt="watch -n1 ros2 topic list"
     alias rnodes="ros2 node list"
     alias start="rl robot_bringup robot_bringup_launch.py"
+    alias start_vio="rl robot_bringup robot_vio_bringup_launch.py"
+    alias setup_vio="/workspace/setup_isaac_ros_vslam.sh"
     alias teleop="rl robot_teleop robot_teleop_launch.py"
     alias rviz="rl robot_description rviz_launch.py"
 fi
