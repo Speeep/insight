@@ -10,9 +10,10 @@ Mirrors the upstream isaac_ros_visual_slam_realsense.launch.py but:
 
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument
-from launch.substitutions import LaunchConfiguration, ParameterValue
+from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import ComposableNodeContainer, Node
 from launch_ros.descriptions import ComposableNode
+from launch_ros.parameter_descriptions import ParameterValue
 
 
 # Pin the on-robot RealSense D455 by serial number. Override at launch time
