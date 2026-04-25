@@ -3,6 +3,7 @@ from launch.actions import DeclareLaunchArgument, ExecuteProcess, IncludeLaunchD
 from launch.conditions import IfCondition, UnlessCondition
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration
+from launch_ros.actions import Node
 from ament_index_python.packages import get_package_share_directory
 import os
 
@@ -58,20 +59,40 @@ def generate_launch_description():
         condition=UnlessCondition(use_isaac_vslam),
     )
 
-    # Preferred path when Isaac ROS Visual SLAM package is installed.
-    # Force camera_namespace+camera_name so RealSense topics land at /camera/...
-    # matching VSLAM subscriptions, and pin the camera serial.
+    # Preferred path: delegate camera + VSLAM bringup to the Isaac launch.
+    # Pass serial pinning via env var (the upstream launch may not expose
+    # camera_namespace as a launch arg, so we don't try to override it here).
     isaac_vslam_launch = ExecuteProcess(
         cmd=[
             'ros2', 'launch', 'isaac_ros_visual_slam',
             'isaac_ros_visual_slam_realsense.launch.py',
-            'camera_namespace:=',
-            'camera_name:=camera',
-            ['serial_no:=', realsense_serial],
         ],
+        additional_env={'RS_SERIAL_NO': ROBOT_REALSENSE_SERIAL},
         output='screen',
         condition=IfCondition(use_isaac_vslam),
     )
+
+    # The Isaac realsense launch publishes RealSense topics under
+    # /camera/camera/... but visual_slam_node subscribes to /camera/...
+    # Bridge those topics with topic_tools relay so VSLAM gets data.
+    relay_topics = [
+        ('/camera/camera/infra1/image_rect_raw', '/camera/infra1/image_rect_raw'),
+        ('/camera/camera/infra1/camera_info', '/camera/infra1/camera_info'),
+        ('/camera/camera/infra2/image_rect_raw', '/camera/infra2/image_rect_raw'),
+        ('/camera/camera/infra2/camera_info', '/camera/infra2/camera_info'),
+        ('/camera/camera/imu', '/camera/imu'),
+    ]
+    relay_nodes = [
+        Node(
+            package='topic_tools',
+            executable='relay',
+            name=f'relay_{src.strip("/").replace("/", "_")}',
+            arguments=[src, dst],
+            output='log',
+            condition=IfCondition(use_isaac_vslam),
+        )
+        for src, dst in relay_topics
+    ]
 
     return LaunchDescription([
         DeclareLaunchArgument(
@@ -87,4 +108,5 @@ def generate_launch_description():
         control_launch,
         realsense_local_launch,
         isaac_vslam_launch,
+        *relay_nodes,
     ])
