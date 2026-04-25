@@ -153,6 +153,7 @@ __marimo__/
 ros_ws/build
 ros_ws/install
 ros_ws/log
+ros_ws/src/isaac_ros/
 
 # RViz / Gazebo / Ignition temporary files
 *.vcg
