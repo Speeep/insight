@@ -1,11 +1,17 @@
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument, ExecuteProcess, IncludeLaunchDescription
+from launch.actions import DeclareLaunchArgument, ExecuteProcess, IncludeLaunchDescription, TimerAction
 from launch.conditions import IfCondition, UnlessCondition
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
 from ament_index_python.packages import get_package_share_directory
 import os
+
+
+# VSLAM expects ~45 Hz input by default (22 ms jitter threshold). Our
+# RealSense streams run at 30 Hz, so frame deltas of ~33 ms are normal
+# but trigger noisy WARN logs. Raise the threshold to match 30 Hz input.
+VSLAM_JITTER_THRESHOLD_MS = 35.0
 
 
 # Pin the on-robot RealSense D455 by serial number so the launch always
@@ -94,6 +100,22 @@ def generate_launch_description():
         for src, dst in relay_topics
     ]
 
+    # Override VSLAM jitter threshold a few seconds after launch so the node
+    # has time to come up before we set the param.
+    set_jitter_threshold = TimerAction(
+        period=8.0,
+        actions=[
+            ExecuteProcess(
+                cmd=[
+                    'ros2', 'param', 'set', '/visual_slam_node',
+                    'image_jitter_threshold_ms', str(VSLAM_JITTER_THRESHOLD_MS),
+                ],
+                output='screen',
+            )
+        ],
+        condition=IfCondition(use_isaac_vslam),
+    )
+
     return LaunchDescription([
         DeclareLaunchArgument(
             'use_isaac_vslam',
@@ -109,4 +131,5 @@ def generate_launch_description():
         realsense_local_launch,
         isaac_vslam_launch,
         *relay_nodes,
+        set_jitter_threshold,
     ])

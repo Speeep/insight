@@ -62,6 +62,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
       ros-humble-joint-state-publisher \
       ros-humble-joint-state-publisher-gui \
       ros-humble-imu-tools \
+      ros-humble-topic-tools \
     && rosdep init || true \
     && rosdep update \
     && rm -rf /var/lib/apt/lists/*
