@@ -33,7 +33,7 @@ def generate_launch_description():
         package='realsense2_camera',
         executable='realsense2_camera_node',
         parameters=[{
-            'serial_no': realsense_serial,
+            'serial_no': ParameterValue(realsense_serial, value_type=str),
             'enable_infra1': True,
             'enable_infra2': True,
             'enable_color': False,
